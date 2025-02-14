@@ -1,0 +1,31 @@
+{
+  "name": "@takoprotocol/anon-react",
+  "version": "0.1.1",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "main": "src/index.tsx",
+  "types": "src/index.tsx",
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "@takoprotocol/anon-sdk": "*",
+    "@tanstack/react-query": "^5.60.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "viem": "^2.21.53",
+    "wagmi": "^2.13.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.4",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5",
+    "ajv": "^7.0.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "@takoprotocol/anon-zk",
+  "version": "0.0.1",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "types": "./src",
+  "main": "src/index.ts",
+  "scripts": {
+    "build:merkle-membership": "cd circuits/merkle-membership && ./build.sh && cd ../..",
+    "build-circuits": "bun run build:merkle-membership"
+  },
+  "dependencies": {
+    "@aztec/bb.js": "^0.61.0",
+    "@noir-lang/noir_js": "^0.38.0"
+  }
+}

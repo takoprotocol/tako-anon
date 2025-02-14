@@ -1,0 +1,11 @@
+{
+  "name": "tako-anon",
+  "version": "0.0.1",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "NO_COLOR=1 bun run --filter '**' build",
+    "next:dev": "NO_COLOR=1 bun run --filter @takoprotocol/next dev",
+    "next:start": "bun run --filter @takoprotocol/next start",
+    "circuits:compile": "bun run --filter @takoprotocol/anon-zk build:merkle-membership"
+  }
+}
