@@ -39,7 +39,7 @@ function Page() {
         setIsError(true);
         window.dispatchEvent(
           new MessageEvent("message", {
-            data: { status: "error", message: "No inject data" },
+            data: { type: "anon", status: "error", message: "No inject data" },
           })
         );
         return;
@@ -56,7 +56,7 @@ function Page() {
         setIsError(true);
         window.dispatchEvent(
           new MessageEvent("message", {
-            data: { status: "error", message: (e as Error).message },
+            data: { type: "anon", status: "error", message: (e as Error).message },
           })
         );
         return;
@@ -70,6 +70,7 @@ function Page() {
       window.dispatchEvent(
         new MessageEvent("message", {
           data: {
+            type: "anon",
             status: "success",
             credential: {
               publicInputs: proof.publicInputs,
@@ -88,7 +89,7 @@ function Page() {
       setIsError(true);
       window.dispatchEvent(
         new MessageEvent("message", {
-          data: { status: "error", message: (e as Error).message },
+          data: { type: "anon", status: "error", message: (e as Error).message },
         })
       );
     }
