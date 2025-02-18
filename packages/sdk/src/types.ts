@@ -46,4 +46,6 @@ export type Credential<T = CreatePostProofInput> = {
   publicInputs: string[];
   proofType: ProofType;
   input: T;
+  reveal?: string;
+  revealHash?: string;
 };

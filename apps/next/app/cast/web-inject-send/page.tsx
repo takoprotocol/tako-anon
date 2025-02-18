@@ -1,13 +1,13 @@
-
 "use client";
 
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { cn, generateSecureRandomString } from "@/lib/utils";
 import { useSDK } from "@takoprotocol/anon-react";
 import { Signature } from "@takoprotocol/anon-sdk";
-import { CreatePostProofInput, ProofType, Credential } from "@takoprotocol/anon-sdk/types";
+import { CreatePostProofInput, Credential, ProofType } from "@takoprotocol/anon-sdk/types";
 import { ProofData } from "@takoprotocol/anon-zk";
 import { useEffect, useState } from "react";
+import { hashMessage } from "viem";
 
 function Page() {
   const { sdk } = useSDK();
@@ -23,17 +23,17 @@ function Page() {
     const injectData:
       | string
       | {
-        signature: Signature;
-        input: CreatePostProofInput;
-      }
-      | undefined = (
-        window as unknown as {
-          injectData?: {
-            signature: Signature;
-            input: CreatePostProofInput;
-          };
+          signature: Signature;
+          input: CreatePostProofInput;
         }
-      )?.injectData;
+      | undefined = (
+      window as unknown as {
+        injectData?: {
+          signature: Signature;
+          input: CreatePostProofInput;
+        };
+      }
+    )?.injectData;
     if (!injectData) {
       setIsError(true);
       window.dispatchEvent(
@@ -61,36 +61,42 @@ function Page() {
       return;
     }
 
+    const reveal = generateSecureRandomString();
+    const revealHash = hashMessage(JSON.stringify(injectData.input) + reveal);
+
     setProgress(90);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (window as any).source.postMessage({
-      status: "success",
-      credential: {
-        publicInputs: proof.publicInputs,
-        proof: Array.from(proof.proof),
-        proofType: ProofType.CREATE_POST,
-        input: injectData.input,
-      } satisfies Credential,
-    }, { targetOrigin: "*" });
+    (window as any).source.postMessage(
+      {
+        status: "success",
+        credential: {
+          publicInputs: proof.publicInputs,
+          proof: Array.from(proof.proof),
+          proofType: ProofType.CREATE_POST,
+          input: injectData.input,
+          reveal: reveal,
+          revealHash: revealHash,
+        } satisfies Credential,
+      },
+      { targetOrigin: "*" }
+    );
 
     setProgress(100);
   };
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-
       if ("injectedData" in event.data) {
         event.source?.postMessage({ type: "iframe-injected-success" }, { targetOrigin: "*" });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (window as any).injectData = event.data.injectedData;
-        (window as unknown as { source: MessageEventSource | null }).source = event.source
+        (window as unknown as { source: MessageEventSource | null }).source = event.source;
       }
     };
 
-    window.addEventListener('message', handleMessage);
-
+    window.addEventListener("message", handleMessage);
   }, []);
 
   useEffect(() => {
@@ -102,20 +108,22 @@ function Page() {
       }
     }, 1000);
 
-    window.addEventListener('message', (event) => {
+    window.addEventListener("message", (event) => {
       // console.log("event in iframe", event.data);
       if (event.data.status === "error") {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window as any).source.postMessage({
-          status: "error",
-          message: event.data.message,
-        }, { targetOrigin: "*" })
+        (window as any).source.postMessage(
+          {
+            status: "error",
+            message: event.data.message,
+          },
+          { targetOrigin: "*" }
+        );
       }
     });
 
     return () => clearInterval(interval);
   }, []);
-
 
   return (
     <div>
