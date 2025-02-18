@@ -1,12 +1,13 @@
 "use client";
 
 import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { cn, generateSecureRandomString } from "@/lib/utils";
 import { useSDK } from "@takoprotocol/anon-react";
 import { Signature } from "@takoprotocol/anon-sdk";
 import { CreatePostProofInput, ProofType, Credential } from "@takoprotocol/anon-sdk/types";
 import { ProofData } from "@takoprotocol/anon-zk";
 import { useEffect, useState } from "react";
+import { hashMessage } from "viem";
 
 function Page() {
   const { sdk } = useSDK();
@@ -61,6 +62,9 @@ function Page() {
         return;
       }
 
+      const reveal = generateSecureRandomString();
+      const revealHash = hashMessage(JSON.stringify(injectData.input) + reveal);
+
       setProgress(90);
 
       window.dispatchEvent(
@@ -72,6 +76,8 @@ function Page() {
               proof: Array.from(proof.proof),
               proofType: ProofType.CREATE_POST,
               input: injectData.input,
+              reveal: reveal,
+              revealHash: revealHash,
             } satisfies Credential,
           },
         })
